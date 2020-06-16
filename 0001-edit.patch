@@ -1,0 +1,219 @@
+From aebe15f0c5a2927c50ef153dc27b8f23f83790ab Mon Sep 17 00:00:00 2001
+From: Michelle Ginsburg <michelleginsburg@michelles-mbp.mynet>
+Date: Tue, 16 Jun 2020 17:59:55 +0100
+Subject: [PATCH] edit
+
+---
+ 0001-Create-Patch-File.patch | 151 +++++++++++++++++++++++++++++++++++
+ client3.py                   |   1 +
+ client_test.py               |  27 +++++++
+ 3 files changed, 179 insertions(+)
+ create mode 100644 0001-Create-Patch-File.patch
+
+diff --git a/0001-Create-Patch-File.patch b/0001-Create-Patch-File.patch
+new file mode 100644
+index 0000000..0249eee
+--- /dev/null
++++ b/0001-Create-Patch-File.patch
+@@ -0,0 +1,151 @@
++From 96c925897f33aa7c71ec9034cd1665db8bbd1e47 Mon Sep 17 00:00:00 2001
++From: Michelle Ginsburg <michelleginsburg@michelles-mbp.mynet>
++Date: Tue, 16 Jun 2020 17:48:50 +0100
++Subject: [PATCH] Create Patch File
++
++---
++ 0001-first-commit.patch | 132 ++++++++++++++++++++++++++++++++++++++++
++ 1 file changed, 132 insertions(+)
++ create mode 100644 0001-first-commit.patch
++
++diff --git a/0001-first-commit.patch b/0001-first-commit.patch
++new file mode 100644
++index 0000000..431d887
++--- /dev/null
+++++ b/0001-first-commit.patch
++@@ -0,0 +1,132 @@
+++From 098c149f0908914eae68e3928587381f101ea8e8 Mon Sep 17 00:00:00 2001
+++From: Michelle Ginsburg <michelleginsburg@michelles-mbp.mynet>
+++Date: Tue, 16 Jun 2020 17:44:01 +0100
+++Subject: [PATCH] first commit
+++
+++---
+++ client3.py     | 48 +++++++++++++++++++++++++++++-------------------
+++ client_test.py | 41 +++++++++++++++++++++++++----------------
+++ 2 files changed, 54 insertions(+), 35 deletions(-)
+++
+++diff --git a/client3.py b/client3.py
+++index f1771c3..1bbb7cd 100644
+++--- a/client3.py
++++++ b/client3.py
+++@@ -29,31 +29,41 @@ QUERY = "http://localhost:8080/query?id={}"
+++ # 500 server request
+++ N = 500
+++ 
++++
+++ def getDataPoint(quote):
+++-	""" Produce all of the needed values to generate a datapoint """
+++-	""" ------------- Update this function ------------- """
+++-	stock = quote['stock']
+++-	bid_price = float(quote['top_bid']['price'])
+++-	ask_price = float(quote['top_ask']['price'])
+++-	price = bid_price
+++-	return stock, bid_price, ask_price, price
++++    """ Produce all of the needed values to generate a datapoint """
++++    """ ------------- Update this function ------------- """
++++    stock = quote['stock']
++++    bid_price = float(quote['top_bid']['price'])
++++    ask_price = float(quote['top_ask']['price'])
++++    price = (bid_price + ask_price)/2
++++    return stock, bid_price, ask_price, price
++++
+++ 
+++ def getRatio(price_a, price_b):
+++-	""" Get ratio of price_a and price_b """
+++-	""" ------------- Update this function ------------- """
+++-	""" Also create some unit tests for this function in client_test.py """
+++-	return 1
++++    """ Get ratio of price_a and price_b """
++++    """ ------------- Update this function ------------- """
++++    """ Also create some unit tests for this function in client_test.py """
++++    if (price_b == 0):
++++        # when price_b is 0 avoid throwing ZeroDivisionError
++++        return
++++    return price_a/price_b
++++
+++ 
+++ # Main
+++ if __name__ == "__main__":
+++ 
+++-	# Query the price once every N seconds.
+++-	for _ in iter(range(N)):
+++-		quotes = json.loads(urllib.request.urlopen(QUERY.format(random.random())).read())
++++    # Query the price once every N seconds.
++++    for _ in range(N):
++++        quotes = json.loads(urllib.request.urlopen(
++++            QUERY.format(random.random())).read())
+++ 
+++-		""" ----------- Update to get the ratio --------------- """
+++-		for quote in quotes:
+++-			stock, bid_price, ask_price, price = getDataPoint(quote)
+++-			print ("Quoted %s at (bid:%s, ask:%s, price:%s)" % (stock, bid_price, ask_price, price))
++++        """ ----------- Update to get the ratio --------------- """
++++        prices = {}
++++        for quote in quotes:
++++            stock, bid_price, ask_price, price = getDataPoint(quote)
++++            prices[stock] = price
++++            print("Quoted %s at (bid:%s, ask:%s, price:%s)" %
++++                  (stock, bid_price, ask_price, price))
+++ 
+++-		print ("Ratio %s" % getRatio(price, price))
++++        print("Ratio %s" % (getRatio(prices['ABC'], prices['DEF'])))
+++diff --git a/client_test.py b/client_test.py
+++index af2bf26..4b97ba0 100644
+++--- a/client_test.py
++++++ b/client_test.py
+++@@ -1,24 +1,33 @@
+++ import unittest
+++-from client3 import getDataPoint
++++from client3 import getDataPoint, getRatio
+++ 
+++-class ClientTest(unittest.TestCase):
+++-  def test_getDataPoint_calculatePrice(self):
+++-    quotes = [
+++-      {'top_ask': {'price': 121.2, 'size': 36}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 120.48, 'size': 109}, 'id': '0.109974697771', 'stock': 'ABC'},
+++-      {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
+++-    ]
+++-    """ ------------ Add the assertion below ------------ """
+++-
+++-  def test_getDataPoint_calculatePriceBidGreaterThanAsk(self):
+++-    quotes = [
+++-      {'top_ask': {'price': 119.2, 'size': 36}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 120.48, 'size': 109}, 'id': '0.109974697771', 'stock': 'ABC'},
+++-      {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
+++-    ]
+++-    """ ------------ Add the assertion below ------------ """
+++ 
++++class ClientTest(unittest.TestCase):
++++    def test_getDataPoint_calculatePrice(self):
++++        quotes = [
++++            {'top_ask': {'price': 121.2, 'size': 36}, 'timestamp': '2019-02-11 22:06:30.572453',
++++                'top_bid': {'price': 120.48, 'size': 109}, 'id': '0.109974697771', 'stock': 'ABC'},
++++            {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453',
++++             'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
++++        ]
++++        """ ------------ Add the assertion below ------------ """
++++    for quote in quotes:
++++        self.assertEqual(getDataPoint(quote), (quote['stock'], quote['top_bid']['price'],
++++                                               quote['top_ask']['price'], (quote['top_bid']['price'] + quote['top_ask']['price'])/2))
+++ 
+++-  """ ------------ Add more unit tests ------------ """
++++    def test_getDataPoint_calculatePriceBidGreaterThanAsk(self):
++++        quotes = [
++++            {'top_ask': {'price': 119.2, 'size': 36}, 'timestamp': '2019-02-11 22:06:30.572453',
++++                'top_bid': {'price': 120.48, 'size': 109}, 'id': '0.109974697771', 'stock': 'ABC'},
++++            {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453',
++++             'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
++++        ]
++++        """ ------------ Add the assertion below ------------ """
++++    for quote in quotes:
++++        self.assertEqual(getDataPoint(quote), (quote['stock'], quote['top_bid']['price'],
++++                                               quote['top_ask']['price'], (quote['top_bid']['price'] + quote['top_ask']['price'])/2))
+++ 
++++    """ ------------ Add more unit tests ------------ """
+++ 
+++ 
+++ if __name__ == '__main__':
+++-- 
+++2.24.3 (Apple Git-128)
+++
++-- 
++2.24.3 (Apple Git-128)
++
+diff --git a/client3.py b/client3.py
+index 1bbb7cd..73a1b8b 100644
+--- a/client3.py
++++ b/client3.py
+@@ -66,4 +66,5 @@ if __name__ == "__main__":
+             print("Quoted %s at (bid:%s, ask:%s, price:%s)" %
+                   (stock, bid_price, ask_price, price))
+ 
++            print "Ratio %s" % getRatio(price, price)
+         print("Ratio %s" % (getRatio(prices['ABC'], prices['DEF'])))
+diff --git a/client_test.py b/client_test.py
+index 4b97ba0..327f642 100644
+--- a/client_test.py
++++ b/client_test.py
+@@ -30,5 +30,32 @@ class ClientTest(unittest.TestCase):
+     """ ------------ Add more unit tests ------------ """
+ 
+ 
++def test_getRatio_priceBZero(self):
++
++
+++    price_a = 119.2
+++    price_b = 0
+++    self.assertIsNone(getRatio(price_a, price_b))
++
+++ def test_getRatio_priceAZero(self):
+++    price_a = 0
+++    price_b = 121.68
+++    self.assertEqual(getRatio(price_a, price_b), 0)
++
+++ def test_getRatio_greaterThan1(self):
+++    price_a = 346.48
+++    price_b = 166.39
+++    self.assertGreater(getRatio(price_a, price_b), 1)
+++
+++ def test_getRatio_LessThan1(self):
+++    price_a = 166.39
+++    price_b = 356.48
+++    self.assertLess(getRatio(price_a, price_b), 1)
+++
+++ def test_getRatio_exactlyOne(self):
+++    price_a = 356.48
+++    price_b = 356.48
+++    self.assertEqual(getRatio(price_a, price_b), 1)
++
+ if __name__ == '__main__':
+     unittest.main()
+-- 
+2.24.3 (Apple Git-128)
+
